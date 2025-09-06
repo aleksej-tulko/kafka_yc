@@ -19,7 +19,7 @@ module "kafka_cluster" {
     subnet_ids = var.subnet_ids
     zones = [data.yandex_client_config.client.zone]
 
-    kafka_version = "3.5"
+    kafka_version = var.kafka_version
     cluster_name = var.cluster_name
 
     kafka_resource_preset_id = var.kafka_resource_preset_id
@@ -34,4 +34,6 @@ module "kafka_cluster" {
     zookeeper_disk_size = var.zookeeper_disk_size
 
     schema_registry = true
+
+    topics = var.kafka_topics
 }
