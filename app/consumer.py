@@ -22,7 +22,7 @@ AUTOOFF_RESET = os.getenv('AUTOOFF_RESET', 'earliest')
 ENABLE_AUTOCOMMIT = os.getenv('ENABLE_AUTOCOMMIT', False)
 FETCH_MIN_BYTES = os.getenv('FETCH_MIN_BYTES', 1)
 FETCH_WAIT_MAX_MS = os.getenv('FETCH_WAIT_MAX_MS', 100)
-SESSION_TIME_MS = os.getenv('SESSION_TIME_MS', 1_000)
+SESSION_TIME_MS = os.getenv('SESSION_TIME_MS', 30_000)
 CONSUMER_USERNAME = os.getenv('CONSUMER_USERNAME', 'consumer')
 CONSUMER_PASSWORD = os.getenv('CONSUMER_PASSWORD', '')
 SCHEMA_REGISTRY_READER_USERNAME = os.getenv(
@@ -38,7 +38,7 @@ consumer_conf = base_conf | {
     'group.id': 'avro-consumer',
     'auto.offset.reset': AUTOOFF_RESET,
     'enable.auto.commit': ENABLE_AUTOCOMMIT,
-    # 'session.timeout.ms': SESSION_TIME_MS,
+    'session.timeout.ms': SESSION_TIME_MS,
     'fetch.min.bytes': FETCH_MIN_BYTES,
     'fetch.wait.max.ms': FETCH_WAIT_MAX_MS,
     'sasl.username': CONSUMER_USERNAME,
