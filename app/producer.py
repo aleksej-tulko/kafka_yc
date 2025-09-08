@@ -93,7 +93,7 @@ def delivery_report(err, msg) -> None:
 base_producer_conf = base_conf | {
     'sasl.username': PRODUCER_USERNAME,
     'sasl.password': PRODUCER_PASSWORD,
-    # 'on_delivery': delivery_report,
+    'on_delivery': delivery_report,
 }
 avro_producer_conf = base_producer_conf | {
     'schema.registry.url': schema_registry_url_auth_basic,
