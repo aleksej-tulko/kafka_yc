@@ -86,3 +86,25 @@ variable "kafka_topics" {
     }
   }]
 }
+
+variable "kafka_users" {
+  description = "Пользователи Kafka"
+  type = list(object({
+    name     = string
+    password = string
+    permissions = list(object({
+      topic_name  = string
+      role        = string
+      allow_hosts = list(string)
+    }))
+  }))
+  default = [{
+    name = ""
+    password = ""
+    permissions = [{
+      topic_name = ""
+      role = ""
+      allow_hosts = [""]
+    }]
+  }]
+}

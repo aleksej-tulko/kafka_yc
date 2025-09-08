@@ -36,4 +36,6 @@ module "kafka_cluster" {
     schema_registry = true
 
     topics = var.kafka_topics
+
+    users = var.kafka_users
 }

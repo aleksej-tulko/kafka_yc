@@ -3,6 +3,11 @@ output "kafka_id" {
   value = module.kafka_cluster.kafka_cluster_id
 }
 
+output "kafka_hosts" {
+  description = "FQDN хостов"
+  value = module.kafka_cluster.hosts
+}
+
 output "kafka_topics" {
   description = "Созданные топики"
   value = module.kafka_cluster.kafka_topic_ids
