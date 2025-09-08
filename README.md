@@ -12,7 +12,7 @@ echo "test message" | kcat -P \
 
 
 kcat -C \
-         -b rc1a-03afo632rrleau6c.mdb.yandexcloud.net:9091 \
+         -b rc1a-hq1uite1apjk5rfr.mdb.yandexcloud.net:9091 \
          -t test_topic \
          -X security.protocol=SASL_SSL \
          -X sasl.mechanism=SCRAM-SHA-512 \

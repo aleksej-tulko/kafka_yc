@@ -23,14 +23,31 @@ formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+base_conf = {
+    'bootstrap.servers': BOOTSTRAP_SERVERS,
+    'security.protocol': SECURITY_PROTOCOL,
+    'sasl.mechanism': AUTH_MECHANISM,
+    'ssl.ca.location': CACERT_PATH,
+}
+
 
 class LoggerMsg:
     """Сообщения для логгирования."""
 
     MSG_NOT_DELIVERED = 'Ошибка доставки {err}.'
     MSG_DELIVERED = 'Сообщение доставлено в топик {topic}.'
+    MSG_RECEIVED = 'Сообщение получено: {value}.'
+    MSG_NOT_DESERIALIZED = 'Сообщение не десериализовано:'
     SCHEMA_ALREADY_EXISTS = ('Схема уже зарегистрирована '
                              'для {subject}: \n{subject_str}.')
     SCHEMA_REGISTERED = ('Зарегистрирована схема {subject} '
                          'с ID {schema_id}.')
     PROGRAM_RUNNING = 'Выполняется программа.'
+
+
+def delivery_report(err, msg) -> None:
+    """Отчет о доставке."""
+    if err is not None:
+        logger.error(msg=LoggerMsg.MSG_NOT_DELIVERED.format(err=err))
+    else:
+        logger.info(msg=LoggerMsg.MSG_DELIVERED.format(topic=msg.topic()))

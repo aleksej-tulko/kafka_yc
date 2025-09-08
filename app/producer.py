@@ -9,14 +9,12 @@ from confluent_kafka.schema_registry import SchemaRegistryClient, Schema
 from dotenv import load_dotenv
 
 from base import (
-    AUTH_MECHANISM,
-    BOOTSTRAP_SERVERS,
+    base_conf,
     CACERT_PATH,
     logger,
     LoggerMsg,
     SCHEMA_REGISTRY_PASSWORD,
     SCHEMA_REGISTRY_URL,
-    SECURITY_PROTOCOL,
     TOPIC
 )
 
@@ -92,13 +90,9 @@ def delivery_report(err, msg) -> None:
         logger.info(msg=LoggerMsg.MSG_DELIVERED.format(topic=msg.topic()))
 
 
-base_producer_conf = {
-    'bootstrap.servers': BOOTSTRAP_SERVERS,
-    'security.protocol': SECURITY_PROTOCOL,
-    'sasl.mechanism': AUTH_MECHANISM,
+base_producer_conf = base_conf | {
     'sasl.username': PRODUCER_USERNAME,
     'sasl.password': PRODUCER_PASSWORD,
-    'ssl.ca.location': CACERT_PATH,
     'on_delivery': delivery_report,
 }
 avro_producer_conf = base_producer_conf | {
@@ -114,14 +108,14 @@ dlq_producer_conf = base_producer_conf
 dlq_producer = Producer(dlq_producer_conf)
 
 
-def send_to_dlq(dlq_producer, dlq_topic, key, value, error) -> None:
+def send_to_dlq(dlq_producer, key, value, error) -> None:
     payload = {
         'key': key,
         'value': value,
         'error': str(error),
     }
     dlq_producer.produce(
-        topic=dlq_topic,
+        topic=DLQ,
         key=str(key).encode(),
         value=json.dumps(payload).encode("utf-8"),
     )
@@ -135,7 +129,6 @@ def create_message(producer: avro.AvroProducer) -> None:
     except Exception as e:
         send_to_dlq(
             dlq_producer=dlq_producer,
-            dlq_topic=DLQ,
             key=key,
             value=value,
             error=e
@@ -173,7 +166,6 @@ def register_schema_version():
 
 if __name__ == '__main__':
     """Запуск программы."""
-
     register_schema_version()
 
     producer_thread = Thread(
