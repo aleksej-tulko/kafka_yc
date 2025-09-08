@@ -1,0 +1,26 @@
+services:
+  app_producer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    env_file:
+      - .env
+    networks:
+     - kafka-network
+    command: python3 producer.py
+    restart: always
+
+  app_consumer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    env_file:
+      - .env
+    networks:
+     - kafka-network
+    command: python3 consumer.py
+    restart: always
+
+networks:
+  kafka-network:
+    external: true
