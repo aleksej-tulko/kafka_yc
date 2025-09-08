@@ -18,6 +18,11 @@ from base import (
 
 load_dotenv()
 
+AUTOOFF_RESET = os.getenv('AUTOOFF_RESET', 'earliest')
+ENABLE_AUTOCOMMIT = os.getenv('ENABLE_AUTOCOMMIT', False)
+FETCH_MIN_BYTES = os.getenv('FETCH_MIN_BYTES', 1)
+FETCH_WAIT_MAX_MS = os.getenv('FETCH_WAIT_MAX_MS', 100)
+SESSION_TIME_MS = os.getenv('SESSION_TIME_MS', 1_000)
 CONSUMER_USERNAME = os.getenv('CONSUMER_USERNAME', 'consumer')
 CONSUMER_PASSWORD = os.getenv('CONSUMER_PASSWORD', '')
 SCHEMA_REGISTRY_READER_USERNAME = os.getenv(
