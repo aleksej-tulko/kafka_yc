@@ -39,7 +39,7 @@ consumer_conf = base_conf | {
     'auto.offset.reset': AUTOOFF_RESET,
     'enable.auto.commit': ENABLE_AUTOCOMMIT,
     'session.timeout.ms': SESSION_TIME_MS,
-    'fetch.min.bytes': FETCH_MIN_BYTES,
+    # 'fetch.min.bytes': FETCH_MIN_BYTES,
     # 'fetch.wait.max.ms': FETCH_WAIT_MAX_MS,
     'sasl.username': CONSUMER_USERNAME,
     'sasl.password': CONSUMER_PASSWORD,
