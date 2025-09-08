@@ -38,7 +38,7 @@ consumer_conf = base_conf | {
     'group.id': 'avro-consumer',
     'auto.offset.reset': AUTOOFF_RESET,
     'enable.auto.commit': ENABLE_AUTOCOMMIT,
-    'session.timeout.ms': 60_000,
+    'session.timeout.ms': SESSION_TIME_MS,
     'fetch.min.bytes': FETCH_MIN_BYTES,
     'fetch.wait.max.ms': FETCH_WAIT_MAX_MS,
     'sasl.username': CONSUMER_USERNAME,
