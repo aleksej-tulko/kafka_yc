@@ -63,6 +63,8 @@ def consume_infinite_loop(consumer: avro.AvroConsumer) -> None:
             value = msg.value()
             consumer.commit(asynchronous=False)
 
+            print(msg)
+
             logger.debug(
                 msg=LoggerMsg.MSG_RECEIVED.format(value=value)
             )
