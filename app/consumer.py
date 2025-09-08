@@ -36,7 +36,7 @@ schema_registry_url_auth_basic = (
 
 consumer_conf = base_conf | {
     'group.id': 'avro-consumer',
-    # 'auto.offset.reset': AUTOOFF_RESET,
+    'auto.offset.reset': AUTOOFF_RESET,
     # 'enable.auto.commit': ENABLE_AUTOCOMMIT,
     # 'session.timeout.ms': SESSION_TIME_MS,
     # 'fetch.min.bytes': FETCH_MIN_BYTES,
