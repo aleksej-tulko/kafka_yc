@@ -40,7 +40,7 @@ consumer_conf = base_conf | {
     'enable.auto.commit': ENABLE_AUTOCOMMIT,
     'session.timeout.ms': SESSION_TIME_MS,
     'fetch.min.bytes': FETCH_MIN_BYTES,
-    'fetch.wait.max.ms': FETCH_WAIT_MAX_MS,
+    # 'fetch.wait.max.ms': FETCH_WAIT_MAX_MS,
     'sasl.username': CONSUMER_USERNAME,
     'sasl.password': CONSUMER_PASSWORD,
     'schema.registry.url': schema_registry_url_auth_basic,
