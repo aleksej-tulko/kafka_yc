@@ -6,7 +6,7 @@ RUN mkdir -p /usr/local/share/ca-certificates/Yandex/
 
 COPY ./YandexInternalRootCA.crt /usr/local/share/ca-certificates/Yandex/
 
-RUN chmode 0444 /usr/local/share/ca-certificates/Yandex/YandexInternalRootCA.crt
+RUN chmod 0444 /usr/local/share/ca-certificates/Yandex/YandexInternalRootCA.crt
 
 COPY requirements.txt .
 
