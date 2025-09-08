@@ -9,9 +9,9 @@ services:
      - kafka-network
     command: python3 producer.py
     restart: always
-    deploy:
-      mode: replicated
-      replicas: 3
+    # deploy:
+    #   mode: replicated
+    #   replicas: 3
 
   app_consumer:
     build:
@@ -23,9 +23,9 @@ services:
      - kafka-network
     command: python3 consumer.py
     restart: always
-    deploy:
-      mode: replicated
-      replicas: 1
+    # deploy:
+    #   mode: replicated
+    #   replicas: 1
 
 networks:
   kafka-network:
