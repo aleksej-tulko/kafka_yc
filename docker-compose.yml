@@ -18,6 +18,8 @@ services:
     image: apache/nifi:latest
     ports:
       - 8080:8080
+    networks:
+     - kafka-network
     environment:
       - NIFI_WEB_HTTP_PORT=8080
       - NIFI_CLUSTER_IS_NODE=true
@@ -56,3 +58,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+
+networks:
+  kafka-network:
+    external: true
