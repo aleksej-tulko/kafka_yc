@@ -1,14 +1,14 @@
 services:
   nifi:
-      image: apache/nifi:1.21.0
-      container_name: nifi
-      user: root
-      ports:
-        - 8080:8080
-      networks:
-        - confluent
-      environment:
-        NIFI_WEB_HTTP_PORT: 8080
+    image: apache/nifi:1.21.0
+    container_name: nifi
+    user: root
+    ports:
+      - 8080:8080
+    networks:
+      - kafka-network
+    environment:
+      NIFI_WEB_HTTP_PORT: 8080
 
   app_producer:
     build:
@@ -17,7 +17,7 @@ services:
     env_file:
       - .env
     networks:
-     - kafka-network
+      - kafka-network
     command: python3 producer.py
     restart: always
     deploy:
@@ -31,7 +31,7 @@ services:
     env_file:
       - .env
     networks:
-     - kafka-network
+      - kafka-network
     command: python3 consumer.py
     restart: always
     deploy:
