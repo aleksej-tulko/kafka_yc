@@ -32,6 +32,9 @@ services:
       - NIFI_ZK_CONNECT_STRING=zookeeper:2181
       - NIFI_ELECTION_MAX_WAIT=1 min
       - NIFI_SENSITIVE_PROPS_KEY=3e38a10eb5fb
+    volumes:
+      - nifi_logs:/opt/nifi/nifi-current/logs
+      - nifi_data:/opt/nifi/nifi-current/data
   # nifi:
   #   image: apache/nifi:1.21.0
   #   container_name: nifi
