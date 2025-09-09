@@ -9,6 +9,9 @@ services:
       - kafka-network
     environment:
       NIFI_WEB_HTTP_PORT: 8080
+    volumes:
+      - nifi_logs:/opt/nifi/nifi-current/logs
+      - nifi_data:/opt/nifi/nifi-current/data
 
   app_producer:
     build:
@@ -37,6 +40,10 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+
+volumes:
+  nifi_logs:
+  nifi_data:
 
 networks:
   kafka-network:
