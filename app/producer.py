@@ -87,7 +87,12 @@ def delivery_report(err, msg) -> None:
     if err is not None:
         logger.error(msg=LoggerMsg.MSG_NOT_DELIVERED.format(err=err))
     else:
-        logger.info(msg=LoggerMsg.MSG_DELIVERED.format(topic=msg.topic()))
+        logger.info(
+            msg=LoggerMsg.MSG_DELIVERED.format(
+                topic=msg.topic(),
+                partition=msg.partition()
+            )
+        )
 
 
 base_producer_conf = base_conf | {
@@ -117,7 +122,7 @@ def send_to_dlq(dlq_producer, key, value, error) -> None:
     dlq_producer.produce(
         topic=DLQ,
         key=str(key).encode(),
-        value=json.dumps(payload).encode("utf-8"),
+        value=json.dumps(payload).encode('utf-8'),
     )
     dlq_producer.flush()
 

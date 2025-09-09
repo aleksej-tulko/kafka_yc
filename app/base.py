@@ -35,7 +35,7 @@ class LoggerMsg:
     """Сообщения для логгирования."""
 
     MSG_NOT_DELIVERED = 'Ошибка доставки {err}.'
-    MSG_DELIVERED = 'Сообщение доставлено в топик {topic}.'
+    MSG_DELIVERED = 'Сообщение доставлено в {topic} в раздел {partition}.'
     MSG_RECEIVED = 'Сообщение получено: {value}.'
     MSG_NOT_DESERIALIZED = 'Сообщение не десериализовано:'
     SCHEMA_ALREADY_EXISTS = ('Схема уже зарегистрирована '
