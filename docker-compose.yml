@@ -1,14 +1,14 @@
 services:
   nifi:
-    image: apache/nifi:latest
-    ports:
-      - 8080:8080
-    networks:
-     - kafka-network
-    environment:
-      - NIFI_WEB_HTTP_PORT=8080
-    restart: always
-
+      image: apache/nifi:1.21.0
+      container_name: nifi
+      user: root
+      ports:
+        - 8080:8080
+      networks:
+        - confluent
+      environment:
+        NIFI_WEB_HTTP_PORT: 8080
 
   app_producer:
     build:
