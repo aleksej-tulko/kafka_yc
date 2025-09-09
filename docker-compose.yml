@@ -1,72 +1,14 @@
 services:
-  zookeeper:
-   image: confluentinc/cp-zookeeper:7.4.4
-   container_name: zookeeper
-   hostname: zookeeper
-   ports:
-     - 2181:2181
-   networks:
-     - kafka-network
-   environment:
-     ZOOKEEPER_SERVER_ID: 1
-     ZOOKEEPER_CLIENT_PORT: 2181
-     ZOOKEEPER_TICK_TIME: 2000
-     ZOOKEEPER_INIT_LIMIT: 5
-     ZOOKEEPER_SYNC_LIMIT: 2
-
-  nifi-1:
+  nifi:
     image: apache/nifi:latest
     ports:
       - 8080:8080
     networks:
      - kafka-network
     environment:
-      - NIFI_CLUSTER_NODE_ADDRESS=nifi-1
-      - NIFI_SENSITIVE_PROPS_KEY=1111111111111111111111
       - NIFI_WEB_HTTP_PORT=8080
-      - NIFI_CLUSTER_IS_NODE=true
-      - NIFI_CLUSTER_NODE_PROTOCOL_PORT=8082
-      - NIFI_ZK_CONNECT_STRING=zookeeper:2181
-      - NIFI_ELECTION_MAX_WAIT=1 min
-      - NIFI_CLUSTER_PROTOCOL_IS_SECURE=false
-      - NIFI_CLUSTER_LOAD_BALANCE_PORT=6342
     restart: always
 
-  nifi-2:
-    image: apache/nifi:latest
-    ports:
-      - 8081:8080
-    networks:
-     - kafka-network
-    environment:
-      - NIFI_CLUSTER_NODE_ADDRESS=nifi-2
-      - NIFI_SENSITIVE_PROPS_KEY=1111111111111111111111
-      - NIFI_WEB_HTTP_PORT=8080
-      - NIFI_CLUSTER_IS_NODE=true
-      - NIFI_CLUSTER_NODE_PROTOCOL_PORT=8082
-      - NIFI_ZK_CONNECT_STRING=zookeeper:2181
-      - NIFI_ELECTION_MAX_WAIT=1 min
-      - NIFI_CLUSTER_PROTOCOL_IS_SECURE=false
-      - NIFI_CLUSTER_LOAD_BALANCE_PORT=6342
-    restart: always
-
-  nifi-3:
-    image: apache/nifi:latest
-    ports:
-      - 8082:8080
-    networks:
-     - kafka-network
-    environment:
-      - NIFI_CLUSTER_NODE_ADDRESS=nifi-3
-      - NIFI_SENSITIVE_PROPS_KEY=1111111111111111111111
-      - NIFI_WEB_HTTP_PORT=8080
-      - NIFI_CLUSTER_IS_NODE=true
-      - NIFI_CLUSTER_NODE_PROTOCOL_PORT=8082
-      - NIFI_ZK_CONNECT_STRING=zookeeper:2181
-      - NIFI_ELECTION_MAX_WAIT=1 min
-      - NIFI_CLUSTER_PROTOCOL_IS_SECURE=false
-      - NIFI_CLUSTER_LOAD_BALANCE_PORT=6342
-    restart: always
 
   app_producer:
     build:
