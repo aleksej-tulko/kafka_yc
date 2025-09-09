@@ -17,6 +17,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+    container_name: producer
     env_file:
       - .env
     networks:
@@ -31,6 +32,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+    container_name: consumer
     env_file:
       - .env
     networks:
