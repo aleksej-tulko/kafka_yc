@@ -29,6 +29,7 @@ services:
       - NIFI_ZK_CONNECT_STRING=zookeeper:2181
       - NIFI_ELECTION_MAX_WAIT=1 min
       - NIFI_CLUSTER_PROTOCOL_IS_SECURE=false
+      - NIFI_CLUSTER_LOAD_BALANCE_PORT=6342
     restart: always
 
   nifi-2:
@@ -46,6 +47,7 @@ services:
       - NIFI_ZK_CONNECT_STRING=zookeeper:2181
       - NIFI_ELECTION_MAX_WAIT=1 min
       - NIFI_CLUSTER_PROTOCOL_IS_SECURE=false
+      - NIFI_CLUSTER_LOAD_BALANCE_PORT=6342
     restart: always
 
   nifi-3:
@@ -63,6 +65,7 @@ services:
       - NIFI_ZK_CONNECT_STRING=zookeeper:2181
       - NIFI_ELECTION_MAX_WAIT=1 min
       - NIFI_CLUSTER_PROTOCOL_IS_SECURE=false
+      - NIFI_CLUSTER_LOAD_BALANCE_PORT=6342
     restart: always
 
   app_producer:
