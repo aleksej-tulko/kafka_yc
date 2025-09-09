@@ -21,6 +21,7 @@ services:
     networks:
      - kafka-network
     environment:
+      - NIFI_CLUSTER_NODE_ADDRESS=nifi-1
       - NIFI_SENSITIVE_PROPS_KEY=1111111111111111111111
       - NIFI_WEB_HTTP_PORT=8080
       - NIFI_CLUSTER_IS_NODE=true
@@ -37,6 +38,7 @@ services:
     networks:
      - kafka-network
     environment:
+      - NIFI_CLUSTER_NODE_ADDRESS=nifi-2
       - NIFI_SENSITIVE_PROPS_KEY=1111111111111111111111
       - NIFI_WEB_HTTP_PORT=8080
       - NIFI_CLUSTER_IS_NODE=true
@@ -53,6 +55,7 @@ services:
     networks:
      - kafka-network
     environment:
+      - NIFI_CLUSTER_NODE_ADDRESS=nifi-3
       - NIFI_SENSITIVE_PROPS_KEY=1111111111111111111111
       - NIFI_WEB_HTTP_PORT=8080
       - NIFI_CLUSTER_IS_NODE=true
