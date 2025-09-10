@@ -20,3 +20,27 @@ kcat -C \
          -X sasl.password="consumer_pass" \
          -X ssl.ca.location=/usr/local/share/ca-certificates/Yandex/YandexInternalRootCA.crt -Z -K:
 
+
+BOOTSTRAP_SERVERS='rc1a-t42k58rtbsjtmf1v.mdb.yandexcloud.net:9091,rc1a-ktct3jh4n9619k86.mdb.yandexcloud.net:9091,rc1a-cus7tem1ohe8stc0.mdb.yandexcloud.net:9091'
+TOPIC='test_topic'
+DLQ='dead_letter_queue'
+
+ACKS_LEVEL='all'
+RETRIES=3
+COMPRESSION_TYPE='lz4'
+AUTOOFF_RESET='earliest'
+ENABLE_AUTOCOMMIT=False
+SESSION_TIME_MS=60000
+FETCH_MIN_BYTES=1
+FETCH_WAIT_MAX_MS=100
+
+PRODUCER_USERNAME='test_producer'
+CONSUMER_USERNAME='test_consumer'
+SCHEMA_REGISTRY_WRITER_USERNAME='test_schema_writer'
+SCHEMA_REGISTRY_READER_USERNAME='test_schema_reader'
+
+PRODUCER_PASSWORD='producer_pass'
+
+CONSUMER_PASSWORD='consumer_pass'
+SCHEMA_REGISTRY_PASSWORD='schema_pass'
+
