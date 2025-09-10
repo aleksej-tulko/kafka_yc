@@ -27,7 +27,7 @@ services:
     volumes:
       - nifi_logs:/opt/nifi/nifi-current/logs
       - nifi_data:/opt/nifi/nifi-current/data
-      - /opt/nifi_lib:/opt/nifi/nifi-current/lib
+      # - /opt/nifi_lib:/opt/nifi/nifi-current/lib
 
   app_producer:
     build:
