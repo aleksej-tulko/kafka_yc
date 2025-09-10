@@ -56,6 +56,22 @@ services:
       mode: replicated
       replicas: 1
 
+  postgres:
+    image: debezium/postgres:16
+    hostname: postgres
+    container_name: postgres
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      - ./postgres/user-config.conf:/etc/postgresql/postgresql.conf
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - kafka-network
+
 volumes:
   nifi_logs:
   nifi_data:

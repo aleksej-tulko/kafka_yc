@@ -21,7 +21,7 @@ kcat -C \
          -X ssl.ca.location=/usr/local/share/ca-certificates/Yandex/YandexInternalRootCA.crt -Z -K:
 
 
-BOOTSTRAP_SERVERS='rc1a-t42k58rtbsjtmf1v.mdb.yandexcloud.net:9091,rc1a-ktct3jh4n9619k86.mdb.yandexcloud.net:9091,rc1a-cus7tem1ohe8stc0.mdb.yandexcloud.net:9091'
+BOOTSTRAP_SERVERS='rc1a-ogiukf269dcq1fjl.mdb.yandexcloud.net:9091,rc1a-loo1b18k4g8vtni6.mdb.yandexcloud.net:9091,rc1a-i5av71a9j1edfr0c.mdb.yandexcloud.net:9091'
 TOPIC='test_topic'
 DLQ='dead_letter_queue'
 
@@ -43,4 +43,8 @@ PRODUCER_PASSWORD='producer_pass'
 
 CONSUMER_PASSWORD='consumer_pass'
 SCHEMA_REGISTRY_PASSWORD='schema_pass'
+
+POSTGRES_USER=postgres-user
+POSTGRES_PASSWORD=postgres-pw
+POSTGRES_DB=online
 
