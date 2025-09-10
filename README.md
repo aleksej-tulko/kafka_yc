@@ -44,7 +44,14 @@ PRODUCER_PASSWORD='producer_pass'
 CONSUMER_PASSWORD='consumer_pass'
 SCHEMA_REGISTRY_PASSWORD='schema_pass'
 
-POSTGRES_USER=postgres-user
-POSTGRES_PASSWORD=postgres-pw
-POSTGRES_DB=online
+POSTGRES_USER='postgres-user'
+POSTGRES_PASSWORD='postgres-pw'
+POSTGRES_DB='postgres-db'
+
+
+CREATE TABLE test (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    info VARCHAR(100)
+);
 
