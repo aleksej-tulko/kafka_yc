@@ -123,6 +123,8 @@ services:
     entrypoint: vault server -config /vault/config/config.hcl
 
 volumes:
+  zookeeper_log:
+  zookeeper_data:
   vault_config:
   vault_certs:
   vault_secrets:
