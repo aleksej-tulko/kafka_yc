@@ -61,6 +61,7 @@ services:
       nifi-toolkit:
         condition: service_completed_successfully
     volumes:
+      - ./kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
       - nifi_certs:/opt/certs
       - nifi-1_conf:/opt/nifi/nifi-current/conf
       - nifi-1_extensions:/opt/nifi/nifi-current/extensions
@@ -89,6 +90,7 @@ services:
       nifi-toolkit:
         condition: service_completed_successfully
     volumes:
+      - ./kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
       - nifi_certs:/opt/certs
       - nifi-2_conf:/opt/nifi/nifi-current/conf
       - nifi-2_extensions:/opt/nifi/nifi-current/extensions
@@ -117,6 +119,7 @@ services:
       nifi-toolkit:
         condition: service_completed_successfully
     volumes:
+      - ./kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
       - nifi_certs:/opt/certs
       - nifi-3_conf:/opt/nifi/nifi-current/conf
       - nifi-3_extensions:/opt/nifi/nifi-current/extensions
