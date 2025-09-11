@@ -63,6 +63,7 @@ services:
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
       NIFI_WEB_HTTPS_PORT: 8443
+      NIFI_ZOOKEEPER_CLIENT_SECURE: true
       NIFI_JVM_OPTS: >
         -Djava.security.auth.login.config=/opt/certs/nifi-jaas.conf
         -Dzookeeper.sasl.client=true
