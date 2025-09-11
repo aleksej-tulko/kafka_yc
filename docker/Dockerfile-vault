@@ -6,8 +6,6 @@ RUN mkdir /vault/certs
 
 RUN mkdir /vault/secrets
 
-RUN mkdir /vault/config/
-
-COPY vault/config/ /vault/configs/
+COPY ../vault/config.hcl /vault/config/
 
 RUN chown 100:1000 /vault -R
