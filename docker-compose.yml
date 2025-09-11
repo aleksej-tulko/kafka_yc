@@ -182,7 +182,7 @@ services:
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
 
   proxy:
-    image: nginx:latesыt
+    image: nginx:latest
     container_name: proxy
     hostname: nginx
     ports:
