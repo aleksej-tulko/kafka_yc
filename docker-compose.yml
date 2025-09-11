@@ -37,7 +37,7 @@ services:
       KAFKA_OPTS: >-
         -Djava.security.auth.login.config=/etc/zookeeper/secrets/zookeeper.sasl.jaas.conf
         -Dzookeeper.authProvider.sasl=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
-        -Dzookeeper.allowSaslFailedClients=false
+        -Dzookeeper.allowSaslFailedClients=true
         -Dzookeeper.requireClientAuthScheme=sasl
     networks:
       - kafka-network
@@ -63,6 +63,10 @@ services:
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
       NIFI_WEB_HTTPS_PORT: 8443
+      NIFI_JVM_OPTS: >
+        -Djava.security.auth.login.config=/opt/certs/nifi-jaas.conf
+        -Dzookeeper.sasl.client=true
+        -Dzookeeper.sasl.clientconfig=Client
     volumes:
       - /opt/secrets:/opt/certs
       - /opt/nifi_logs/nifi-1:/opt/nifi/nifi-current/logs
@@ -91,6 +95,10 @@ services:
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
       NIFI_WEB_HTTPS_PORT: 8443
+      NIFI_JVM_OPTS: >
+        -Djava.security.auth.login.config=/opt/certs/nifi-jaas.conf
+        -Dzookeeper.sasl.client=true
+        -Dzookeeper.sasl.clientconfig=Client
     volumes:
       - /opt/secrets:/opt/certs
       - /opt/nifi_logs/nifi-2:/opt/nifi/nifi-current/logs
@@ -119,6 +127,10 @@ services:
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
       NIFI_WEB_HTTPS_PORT: 8443
+      NIFI_JVM_OPTS: >
+        -Djava.security.auth.login.config=/opt/certs/nifi-jaas.conf
+        -Dzookeeper.sasl.client=true
+        -Dzookeeper.sasl.clientconfig=Client
     volumes:
       - /opt/secrets:/opt/certs
       - /opt/nifi_logs/nifi-3:/opt/nifi/nifi-current/logs
