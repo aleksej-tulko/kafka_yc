@@ -44,7 +44,6 @@ services:
   
   nifi-1:
     image: apache/nifi:1.21.0
-    container_name: nifi
     ports:
       - 8080:8443
     networks:
@@ -73,9 +72,8 @@ services:
 
   nifi-2:
     image: apache/nifi:1.21.0
-    container_name: nifi
     ports:
-      - 8083:8443
+      - 8082:8443
     networks:
       - kafka-network
     environment:
@@ -102,7 +100,6 @@ services:
 
   nifi-3:
     image: apache/nifi:1.21.0
-    container_name: nifi
     ports:
       - 8083:8443
     networks:
