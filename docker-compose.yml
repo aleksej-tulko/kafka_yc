@@ -3,8 +3,6 @@ services:
     image: confluentinc/cp-zookeeper:7.4.4
     container_name: zookeeper
     hostname: zookeeper
-    ports:
-      - 2181:2181
     networks:
       - kafka-network
     environment:
@@ -26,6 +24,7 @@ services:
     networks:
       - kafka-network
     environment:
+      AUTH: tls
       KEYSTORE_TYPE: PKCS12
       KEYSTORE_PASSWORD: changeit
       TRUSTSTORE_TYPE: JKS
@@ -39,8 +38,7 @@ services:
       NIFI_ZK_CONNECT_STRING: zookeeper:2181
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
-      NIFI_CLUSTER_ADDRESS: "nifi-1"
-      NIFI_WEB_HTTPS_HOST: "nifi-1"
+      NIFI_CLUSTER_ADDRESS: nifi-1
     volumes:
       - /opt/secrets:/opt/certs
       - /opt/nifi_logs/nifi-1:/opt/nifi/nifi-current/logs
@@ -57,6 +55,7 @@ services:
     networks:
       - kafka-network
     environment:
+      AUTH: tls
       KEYSTORE_TYPE: PKCS12
       KEYSTORE_PASSWORD: changeit
       TRUSTSTORE_TYPE: JKS
@@ -70,8 +69,7 @@ services:
       NIFI_ZK_CONNECT_STRING: zookeeper:2181
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
-      NIFI_CLUSTER_ADDRESS: "nifi-2"
-      NIFI_WEB_HTTPS_HOST: "nifi-2"
+      NIFI_CLUSTER_ADDRESS: nifi-2
     volumes:
       - /opt/secrets:/opt/certs
       - /opt/nifi_logs/nifi-2:/opt/nifi/nifi-current/logs
@@ -88,6 +86,7 @@ services:
     networks:
       - kafka-network
     environment:
+      AUTH: tls
       KEYSTORE_TYPE: PKCS12
       KEYSTORE_PASSWORD: changeit
       TRUSTSTORE_TYPE: JKS
@@ -101,8 +100,7 @@ services:
       NIFI_ZK_CONNECT_STRING: zookeeper:2181
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
-      NIFI_CLUSTER_ADDRESS: "nifi-3"
-      NIFI_WEB_HTTPS_HOST: "nifi-3"
+      NIFI_CLUSTER_ADDRESS: nifi-3
     volumes:
       - /opt/secrets:/opt/certs
       - /opt/nifi_logs/nifi-3:/opt/nifi/nifi-current/logs
@@ -174,6 +172,20 @@ services:
     cap_add:
       - IPC_LOCK
     entrypoint: vault server -config /vault/config/config.hcl
+
+  proxy:
+    image: nginx:latest
+    container_name: proxy
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 8443:8443
+    networks:
+      - kafka-network
+    depends_on:
+      - nifi-1
+      - nifi-2
+      - nifi-3
 
 volumes:
   zookeeper_log:
