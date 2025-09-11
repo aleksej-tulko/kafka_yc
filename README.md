@@ -54,6 +54,13 @@ CREATE TABLE test (
     info VARCHAR(100)
 );
 
+CREATE TABLE test (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    info VARCHAR(100),
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 
 keytool -importcert \
