@@ -48,6 +48,9 @@ POSTGRES_USER='postgres-user'
 POSTGRES_PASSWORD='postgres-pw'
 POSTGRES_DB='postgres-db'
 
+NIFI_USER='nifi-user'
+NIFI_PASSWORD='nifi-pw'
+
 
 CREATE TABLE test (
     name VARCHAR(100),

@@ -1,15 +1,12 @@
-x-user: &user admin
-x-pwd: &pwd supersecret1
-
 x-nifi-base: &nifi-base
   image: apache/nifi:1.21.0
   networks:
-    - kafka-network
+    - nifi-network
 
 x-nifi-toolkit-base: &nifi-toolkit-base
   image: apache/nifi-toolkit:1.21.0
   networks:
-    - kafka-network
+    - nifi-network
 
 x-nifi-environment: &nifi-environment
   NIFI_WEB_HTTPS_PORT: 8443
@@ -19,12 +16,12 @@ x-nifi-environment: &nifi-environment
   NIFI_ELECTION_MAX_CANDIDATES: 1
   NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
   NIFI_CLUSTER_NODE_PROTOCOL_PORT: 8082
-  NIFI_WEB_PROXY_HOST: nifi-1:8443,nifi-1,nifi-2:8443,nifi-2,nifi-3:8443,nifi-3,localhost:8080,192.168.1.128:8443
-  SINGLE_USER_CREDENTIALS_USERNAME: *user
-  SINGLE_USER_CREDENTIALS_PASSWORD: *pwd
+  NIFI_WEB_PROXY_HOST: 192.168.1.128:8443
+  SINGLE_USER_CREDENTIALS_USERNAME: ${NIFI_USER}
+  SINGLE_USER_CREDENTIALS_PASSWORD: ${NIFI_PASSWORD}
   NIFI_SECURITY_USER_AUTHORIZER: single-user-authorizer
   NIFI_SECURITY_USER_LOGIN_IDENTITY_PROVIDER: single-user-provider
-  INITIAL_ADMIN_IDENTITY: *user
+  # INITIAL_ADMIN_IDENTITY: ${NIFI_USER}
   AUTH: tls
   KEYSTORE_TYPE: JKS
   KEYSTORE_PASSWORD: supersecretkeystore
@@ -37,16 +34,16 @@ services:
     container_name: zookeeper
     hostname: zookeeper
     networks:
-      - kafka-network
+      - nifi-network
+    volumes:
+      - zookeeper_log:/var/lib/zookeeper/log
+      - zookeeper_data:/var/lib/zookeeper/data
     environment:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_INIT_LIMIT: 5
       ZOOKEEPER_SYNC_LIMIT: 2
-    volumes:
-      - zookeeper_log:/var/lib/zookeeper/log
-      - zookeeper_data:/var/lib/zookeeper/data
 
   nifi-toolkit:
     <<: *nifi-toolkit-base
@@ -56,10 +53,10 @@ services:
     user: root
     entrypoint: ["bash", "-c", "/opt/nifi-toolkit/*/bin/tls-toolkit.sh standalone -o /opt/certs -n nifi-[1-3] -P supersecrettruststore -K supersecretkeystore -S supersecretkeystore; chown -R nifi:nifi /opt/certs"]
 
-  
   nifi-1:
     <<: *nifi-base
     container_name: nifi-1
+    hostname: nifi-1
     depends_on:
       nifi-toolkit:
         condition: service_completed_successfully
@@ -87,6 +84,7 @@ services:
   nifi-2:
     <<: *nifi-base
     container_name: nifi-2
+    hostname: nifi-2
     depends_on:
       nifi-toolkit:
         condition: service_completed_successfully
@@ -114,6 +112,7 @@ services:
   nifi-3:
     <<: *nifi-base
     container_name: nifi-3
+    hostname: nifi-3
     depends_on:
       nifi-toolkit:
         condition: service_completed_successfully
@@ -141,11 +140,11 @@ services:
   app_producer:
     build:
       context: .
-      dockerfile: docker/Dockerfile-app
+      dockerfile: docker/Dockerfile
+    networks:
+      - nifi-network
     env_file:
       - .env
-    networks:
-      - kafka-network
     command: python3 producer.py
     restart: always
     deploy:
@@ -155,23 +154,25 @@ services:
   app_consumer:
     build:
       context: .
-      dockerfile: docker/Dockerfile-app
+      dockerfile: docker/Dockerfile
+    networks:
+      - nifi-network
     env_file:
       - .env
-    networks:
-      - kafka-network
     command: python3 consumer.py
     restart: always
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 3
 
   postgres:
     image: debezium/postgres:16
-    hostname: postgres
     container_name: postgres
+    hostname: postgres
     ports:
       - 127.0.0.1:5432:5432
+    networks:
+      - nifi-network
     volumes:
       - ./postgres/user-config.conf:/etc/postgresql/postgresql.conf
     environment:
@@ -179,39 +180,17 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
-    networks:
-      - kafka-network
-
-  # vault:
-  #   build:
-  #     context: .
-  #     dockerfile: docker/Dockerfile-vault
-  #   volumes:
-  #     - vault_config:/vault/config
-  #     - vault_certs:/vault/certs
-  #     - vault_secrets:/vault/secrets
-  #   user: 100:1000
-  #   networks:
-  #     - kafka-network
-  #   container_name: vault
-  #   environment:
-  #     VAULT_ADDR: "http://127.0.0.1:8200"
-  #   ports:
-  #     - 8200:8200
-  #   restart: always
-  #   cap_add:
-  #     - IPC_LOCK
-  #   entrypoint: vault server -config /vault/config/config.hcl
 
   proxy:
-    image: nginx:latest
+    image: nginx:latesыt
     container_name: proxy
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    hostname: nginx
     ports:
       - 8443:8443
     networks:
-      - kafka-network
+      - nifi-network
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - nifi-1
       - nifi-2
@@ -220,9 +199,6 @@ services:
 volumes:
   zookeeper_log:
   zookeeper_data:
-  # vault_config:
-  # vault_certs:
-  # vault_secrets:
   nifi_certs:
   nifi-1_conf:
   nifi-1_extensions:
@@ -250,5 +226,4 @@ volumes:
   nifi-3_logs:
 
 networks:
-  kafka-network:
-    external: true
+  nifi-network:
