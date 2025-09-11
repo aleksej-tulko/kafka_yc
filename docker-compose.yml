@@ -1,51 +1,28 @@
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
-    restart: always
     container_name: zookeeper
     hostname: zookeeper
     ports:
-      - 2281:2281
-    volumes:
-      - zookeeper_log:/var/lib/zookeeper/log
-      - zookeeper_data:/var/lib/zookeeper/data
-      - /opt/secrets:/etc/zookeeper/secrets:ro
+      - 2181:2181
+    networks:
+      - kafka-network
     environment:
       ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_INIT_LIMIT: 5
       ZOOKEEPER_SYNC_LIMIT: 2
-      ZOOKEEPER_SECURE_CLIENT_PORT: 2281
-      ZOOKEEPER_SERVER_CNXN_FACTORY: org.apache.zookeeper.server.NettyServerCnxnFactory
-
-      ZOOKEEPER_SSL_KEYSTORE_TYPE: PKCS12
-      ZOOKEEPER_SSL_KEYSTORE_ALIAS: zookeeper
-
-      ### Truststore and keystore locations
-      ZOOKEEPER_SSL_KEYSTORE_LOCATION: /etc/zookeeper/secrets/zookeeper.p12
-      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /etc/zookeeper/secrets/nifi-cluster-truststore.jks
-
-      ### Passwords
-      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: changeit
-      ZOOKEEPER_SSL_KEY_PASSWORD: changeit
-      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: changeit
-
-      ### Auth for clients
-      ZOOKEEPER_SSL_CLIENT_ENABLE: true
-      ZOOKEEPER_SSL_CLIENT_AUTH: need
-
-      KAFKA_OPTS: >-
-        -Djava.security.auth.login.config=/etc/zookeeper/secrets/zookeeper.sasl.jaas.conf
-        -Dzookeeper.authProvider.sasl=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
-        -Dzookeeper.allowSaslFailedClients=false
-        -Dzookeeper.requireClientAuthScheme=sasl
-    networks:
-      - kafka-network
+    volumes:
+      - zookeeper_log:/var/lib/zookeeper/log
+      - zookeeper_data:/var/lib/zookeeper/data
   
   nifi-1:
     image: apache/nifi:1.21.0
+    container_name: nifi-1
     ports:
-      - 8080:8443
+      - 8081:8080
+      - 8441:8443
     networks:
       - kafka-network
     environment:
@@ -57,23 +34,12 @@ services:
       KEYSTORE_PATH: /opt/certs/nifi-1.p12
       TRUSTSTORE_PATH: /opt/certs/nifi-cluster-truststore.jks
       NIFI_WEB_HTTP_PORT: 8080
+      NIFI_WEB_HTTPS_PORT: 8443
       NIFI_CLUSTER_IS_NODE: true
       NIFI_CLUSTER_NODE_PROTOCOL_PORT: 8082
-      NIFI_ZK_CONNECT_STRING: zookeeper:2281
+      NIFI_ZK_CONNECT_STRING: zookeeper:2181
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
-      NIFI_WEB_HTTPS_PORT: 8443
-      NIFI_ZOOKEEPER_CLIENT_SECURE: true
-      NIFI_ZOOKEEPER_CLIENT_KEYSTORE: /opt/certs/nifi-1.p12
-      NIFI_ZOOKEEPER_CLIENT_KEYSTORETYPE: PKCS12
-      NIFI_ZOOKEEPER_CLIENT_KEYSTOREPASSWORD: changeit
-      NIFI_ZOOKEEPER_CLIENT_TRUSTSTORE: /opt/certs/nifi-cluster-truststore.jks
-      NIFI_ZOOKEEPER_CLIENT_TRUSTSTORETYPE: JKS
-      NIFI_ZOOKEEPER_CLIENT_TRUSTSTOREPASSWORD: changeit
-      NIFI_JVM_OPTS: >
-        -Djava.security.auth.login.config=/opt/certs/nifi-jaas.conf
-        -Dzookeeper.sasl.client=true
-        -Dzookeeper.sasl.clientconfig=Client
     volumes:
       - /opt/secrets:/opt/certs
       - /opt/nifi_logs/nifi-1:/opt/nifi/nifi-current/logs
@@ -83,8 +49,10 @@ services:
 
   nifi-2:
     image: apache/nifi:1.21.0
+    container_name: nifi-2
     ports:
-      - 8082:8443
+      - 8082:8080
+      - 8442:8443
     networks:
       - kafka-network
     environment:
@@ -96,16 +64,12 @@ services:
       KEYSTORE_PATH: /opt/certs/nifi-2.p12
       TRUSTSTORE_PATH: /opt/certs/nifi-cluster-truststore.jks
       NIFI_WEB_HTTP_PORT: 8080
+      NIFI_WEB_HTTPS_PORT: 8443
       NIFI_CLUSTER_IS_NODE: true
       NIFI_CLUSTER_NODE_PROTOCOL_PORT: 8082
-      NIFI_ZK_CONNECT_STRING: zookeeper:2281
+      NIFI_ZK_CONNECT_STRING: zookeeper:2181
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
-      NIFI_WEB_HTTPS_PORT: 8443
-      NIFI_JVM_OPTS: >
-        -Djava.security.auth.login.config=/opt/certs/nifi-jaas.conf
-        -Dzookeeper.sasl.client=true
-        -Dzookeeper.sasl.clientconfig=Client
     volumes:
       - /opt/secrets:/opt/certs
       - /opt/nifi_logs/nifi-2:/opt/nifi/nifi-current/logs
@@ -115,8 +79,10 @@ services:
 
   nifi-3:
     image: apache/nifi:1.21.0
+    container_name: nifi-2
     ports:
       - 8083:8443
+      - 8443:8443
     networks:
       - kafka-network
     environment:
@@ -128,16 +94,12 @@ services:
       KEYSTORE_PATH: /opt/certs/nifi-3.p12
       TRUSTSTORE_PATH: /opt/certs/nifi-cluster-truststore.jks
       NIFI_WEB_HTTP_PORT: 8080
+      NIFI_WEB_HTTPS_PORT: 8443
       NIFI_CLUSTER_IS_NODE: true
       NIFI_CLUSTER_NODE_PROTOCOL_PORT: 8082
       NIFI_ZK_CONNECT_STRING: zookeeper:2281
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
-      NIFI_WEB_HTTPS_PORT: 8443
-      NIFI_JVM_OPTS: >
-        -Djava.security.auth.login.config=/opt/certs/nifi-jaas.conf
-        -Dzookeeper.sasl.client=true
-        -Dzookeeper.sasl.clientconfig=Client
     volumes:
       - /opt/secrets:/opt/certs
       - /opt/nifi_logs/nifi-3:/opt/nifi/nifi-current/logs
