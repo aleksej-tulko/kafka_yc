@@ -64,6 +64,12 @@ services:
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
       NIFI_WEB_HTTPS_PORT: 8443
       NIFI_ZOOKEEPER_CLIENT_SECURE: true
+      NIFI_ZOOKEEPER_CLIENT_KEYSTORE: /opt/certs/nifi-1.p12
+      NIFI_ZOOKEEPER_CLIENT_KEYSTORETYPE: PKCS12
+      NIFI_ZOOKEEPER_CLIENT_KEYSTOREPASSWORD: changeit
+      NIFI_ZOOKEEPER_CLIENT_TRUSTSTORE: /opt/certs/nifi-cluster-truststore.jks
+      NIFI_ZOOKEEPER_CLIENT_TRUSTSTORETYPE: JKS
+      NIFI_ZOOKEEPER_CLIENT_TRUSTSTOREPASSWORD: changeit
       NIFI_JVM_OPTS: >
         -Djava.security.auth.login.config=/opt/certs/nifi-jaas.conf
         -Dzookeeper.sasl.client=true
