@@ -27,6 +27,7 @@ services:
       - /opt/nifi_logs:/opt/nifi/nifi-current/logs
       - /opt/nifi_data:/opt/nifi/nifi-current/data
       - /opt/nifi_lib/postgresql-42.7.6.jar:/opt/nifi/nifi-current/lib/postgresql-42.7.6.jar
+      - /opt/ssl/kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
 
   app_producer:
     build:
