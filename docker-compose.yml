@@ -26,7 +26,7 @@ services:
     volumes:
       - nifi_logs:/opt/nifi/nifi-current/logs
       - nifi_data:/opt/nifi/nifi-current/data
-      - /opt/nifi_lib:/opt/nifi/nifi-current/lib
+      - /opt/nifi_lib/postgresql-42.7.6.jar:/opt/nifi/nifi-current/lib/postgresql-42.7.6.jar
 
   app_producer:
     build:
