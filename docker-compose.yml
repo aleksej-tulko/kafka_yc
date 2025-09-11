@@ -40,6 +40,8 @@ services:
       NIFI_ZK_CONNECT_STRING: zookeeper:2181
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
+      NIFI_CLUSTER_ADDRESS: "nifi-1"
+      NIFI_WEB_HTTPS_HOST: "nifi-1"
     volumes:
       - /opt/secrets:/opt/certs
       - /opt/nifi_logs/nifi-1:/opt/nifi/nifi-current/logs
@@ -70,6 +72,8 @@ services:
       NIFI_ZK_CONNECT_STRING: zookeeper:2181
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
+      NIFI_CLUSTER_ADDRESS: "nifi-2"
+      NIFI_WEB_HTTPS_HOST: "nifi-2"
     volumes:
       - /opt/secrets:/opt/certs
       - /opt/nifi_logs/nifi-2:/opt/nifi/nifi-current/logs
@@ -79,7 +83,7 @@ services:
 
   nifi-3:
     image: apache/nifi:1.21.0
-    container_name: nifi-2
+    container_name: nifi-3
     ports:
       - 8083:8443
       - 8443:8443
@@ -100,6 +104,8 @@ services:
       NIFI_ZK_CONNECT_STRING: zookeeper:2281
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
+      NIFI_CLUSTER_ADDRESS: "nifi-3"
+      NIFI_WEB_HTTPS_HOST: "nifi-3"
     volumes:
       - /opt/secrets:/opt/certs
       - /opt/nifi_logs/nifi-3:/opt/nifi/nifi-current/logs
