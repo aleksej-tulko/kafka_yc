@@ -31,8 +31,8 @@ services:
 
   app_producer:
     build:
-      context: .
-      dockerfile: docker/Dockerfile
+      context: ./docker
+      dockerfile: Dockerfile-app
     env_file:
       - .env
     networks:
@@ -45,8 +45,8 @@ services:
 
   app_consumer:
     build:
-      context: .
-      dockerfile: docker/Dockerfile
+      context: ./docker
+      dockerfile: Dockerfile-app
     env_file:
       - .env
     networks:
@@ -73,9 +73,31 @@ services:
     networks:
       - kafka-network
 
+  vault:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile-vault
+    volumes:
+      - vault_config:/vault/config
+      - vault_certs:/vault/certs
+      - vault_secrets:/vault/secrets
+    user: 100:1000
+    networks:
+      - kafka-network
+    container_name: vault
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+    ports:
+      - 8200:8200
+    restart: always
+    cap_add:
+      - IPC_LOCK
+    entrypoint: vault server -config /vault/config/config.hcl
+
 volumes:
-  nifi_logs:
-  nifi_data:
+  vault_config:
+  vault_certs:
+  vault_secrets:
 
 networks:
   kafka-network:
