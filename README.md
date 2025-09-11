@@ -21,7 +21,7 @@ kcat -C \
          -X ssl.ca.location=/usr/local/share/ca-certificates/Yandex/YandexInternalRootCA.crt -Z -K:
 
 
-BOOTSTRAP_SERVERS='rc1a-ogiukf269dcq1fjl.mdb.yandexcloud.net:9091,rc1a-loo1b18k4g8vtni6.mdb.yandexcloud.net:9091,rc1a-i5av71a9j1edfr0c.mdb.yandexcloud.net:9091'
+BOOTSTRAP_SERVERS='rc1a-8absvvlg11e9di8v.mdb.yandexcloud.net:9091,rc1a-d02dt23g03vidig5.mdb.yandexcloud.net:9091,rc1a-gf0rumtpj5mk5a82.mdb.yandexcloud.net:9091'
 TOPIC='test_topic'
 DLQ='dead_letter_queue'
 
@@ -50,8 +50,15 @@ POSTGRES_DB='postgres-db'
 
 
 CREATE TABLE test (
-    id SERIAL PRIMARY KEY,
     name VARCHAR(100),
     info VARCHAR(100)
 );
 
+
+
+keytool -importcert \
+  -alias kafka-broker \
+  -file YandexInternalRootCA.crt \
+  -keystore kafka-truststore.jks \
+  -storepass changeit \
+  -noprompt
