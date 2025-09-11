@@ -26,7 +26,7 @@ services:
     networks:
       - kafka-network
     environment:
-      AUTH: "tls"
+      AUTH: tls
       KEYSTORE_TYPE: PKCS12
       KEYSTORE_PASSWORD: changeit
       TRUSTSTORE_TYPE: JKS
@@ -58,7 +58,7 @@ services:
     networks:
       - kafka-network
     environment:
-      AUTH: "tls"
+      AUTH: tls
       KEYSTORE_TYPE: PKCS12
       KEYSTORE_PASSWORD: changeit
       TRUSTSTORE_TYPE: JKS
@@ -85,12 +85,12 @@ services:
     image: apache/nifi:1.21.0
     container_name: nifi-3
     ports:
-      - 8083:8443
+      - 8083:8080
       - 8443:8443
     networks:
       - kafka-network
     environment:
-      AUTH: "tls"
+      AUTH: tls
       KEYSTORE_TYPE: PKCS12
       KEYSTORE_PASSWORD: changeit
       TRUSTSTORE_TYPE: JKS
@@ -101,7 +101,7 @@ services:
       NIFI_WEB_HTTPS_PORT: 8443
       NIFI_CLUSTER_IS_NODE: true
       NIFI_CLUSTER_NODE_PROTOCOL_PORT: 8082
-      NIFI_ZK_CONNECT_STRING: zookeeper:2281
+      NIFI_ZK_CONNECT_STRING: zookeeper:2181
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
       NIFI_CLUSTER_ADDRESS: "nifi-3"
