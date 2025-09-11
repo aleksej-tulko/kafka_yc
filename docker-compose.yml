@@ -31,18 +31,6 @@ x-nifi-environment: &nifi-environment
   TRUSTSTORE_TYPE: JKS
   TRUSTSTORE_PASSWORD: supersecrettruststore
 
-x-nifi-2-environment: &nifi-2-environment
-  NIFI_CLUSTER_ADDRESS: nifi-2
-  NIFI_WEB_HTTPS_HOST: nifi-2
-  KEYSTORE_PATH: /opt/certs/nifi-2/keystore.jks
-  TRUSTSTORE_PATH: /opt/certs/nifi-2/truststore.jks
-
-x-nifi-3-environment: &nifi-3-environment
-  NIFI_CLUSTER_ADDRESS: nifi-3
-  NIFI_WEB_HTTPS_HOST: nifi-3
-  KEYSTORE_PATH: /opt/certs/nifi-3/keystore.jks
-  TRUSTSTORE_PATH: /opt/certs/nifi-3/truststore.jks
-
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
@@ -194,26 +182,26 @@ services:
     networks:
       - kafka-network
 
-  vault:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile-vault
-    volumes:
-      - vault_config:/vault/config
-      - vault_certs:/vault/certs
-      - vault_secrets:/vault/secrets
-    user: 100:1000
-    networks:
-      - kafka-network
-    container_name: vault
-    environment:
-      VAULT_ADDR: "http://127.0.0.1:8200"
-    ports:
-      - 8200:8200
-    restart: always
-    cap_add:
-      - IPC_LOCK
-    entrypoint: vault server -config /vault/config/config.hcl
+  # vault:
+  #   build:
+  #     context: .
+  #     dockerfile: docker/Dockerfile-vault
+  #   volumes:
+  #     - vault_config:/vault/config
+  #     - vault_certs:/vault/certs
+  #     - vault_secrets:/vault/secrets
+  #   user: 100:1000
+  #   networks:
+  #     - kafka-network
+  #   container_name: vault
+  #   environment:
+  #     VAULT_ADDR: "http://127.0.0.1:8200"
+  #   ports:
+  #     - 8200:8200
+  #   restart: always
+  #   cap_add:
+  #     - IPC_LOCK
+  #   entrypoint: vault server -config /vault/config/config.hcl
 
   proxy:
     image: nginx:latest
