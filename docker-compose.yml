@@ -31,8 +31,8 @@ services:
 
   app_producer:
     build:
-      context: ./docker
-      dockerfile: Dockerfile-app
+      context: .
+      dockerfile: docker/Dockerfile-app
     env_file:
       - .env
     networks:
@@ -45,8 +45,8 @@ services:
 
   app_consumer:
     build:
-      context: ./docker
-      dockerfile: Dockerfile-app
+      context: .
+      dockerfile: docker/Dockerfile-app
     env_file:
       - .env
     networks:
@@ -75,8 +75,8 @@ services:
 
   vault:
     build:
-      context: ./docker
-      dockerfile: Dockerfile-vault
+      context: .
+      dockerfile: docker/Dockerfile-vault
     volumes:
       - vault_config:/vault/config
       - vault_certs:/vault/certs
