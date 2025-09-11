@@ -220,9 +220,9 @@ services:
 volumes:
   zookeeper_log:
   zookeeper_data:
-  vault_config:
-  vault_certs:
-  vault_secrets:
+  # vault_config:
+  # vault_certs:
+  # vault_secrets:
   nifi_certs:
   nifi-1_conf:
   nifi-1_extensions:
