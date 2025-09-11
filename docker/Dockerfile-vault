@@ -8,6 +8,6 @@ RUN mkdir /vault/secrets
 
 RUN mkdir /vault/config/
 
-COPY vault/config/ /vault/config/
+COPY vault/config/ /vault/configs/
 
 RUN chown 100:1000 /vault -R
