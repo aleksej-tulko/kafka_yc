@@ -42,7 +42,7 @@ services:
     networks:
       - kafka-network
   
-  nifi:
+  nifi-1:
     image: apache/nifi:1.21.0
     container_name: nifi
     ports:
@@ -64,11 +64,68 @@ services:
       NIFI_ELECTION_MAX_WAIT: 1 min
       NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
       NIFI_WEB_HTTPS_PORT: 8443
-
     volumes:
       - /opt/secrets:/opt/certs
-      - /opt/nifi_logs:/opt/nifi/nifi-current/logs
-      - /opt/nifi_data:/opt/nifi/nifi-current/data
+      - /opt/nifi_logs/nifi-1:/opt/nifi/nifi-current/logs
+      - /opt/nifi_data/nifi-1:/opt/nifi/nifi-current/data
+      - /opt/nifi_lib/postgresql-42.7.6.jar:/opt/nifi/nifi-current/lib/postgresql-42.7.6.jar
+      - /opt/ssl/kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
+
+  nifi-2:
+    image: apache/nifi:1.21.0
+    container_name: nifi
+    ports:
+      - 8083:8443
+    networks:
+      - kafka-network
+    environment:
+      AUTH: "tls"
+      KEYSTORE_TYPE: PKCS12
+      KEYSTORE_PASSWORD: changeit
+      TRUSTSTORE_TYPE: JKS
+      TRUSTSTORE_PASSWORD: changeit
+      KEYSTORE_PATH: /opt/certs/nifi-2.p12
+      TRUSTSTORE_PATH: /opt/certs/nifi-cluster-truststore.jks
+      NIFI_WEB_HTTP_PORT: 8080
+      NIFI_CLUSTER_IS_NODE: true
+      NIFI_CLUSTER_NODE_PROTOCOL_PORT: 8082
+      NIFI_ZK_CONNECT_STRING: zookeeper:2281
+      NIFI_ELECTION_MAX_WAIT: 1 min
+      NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
+      NIFI_WEB_HTTPS_PORT: 8443
+    volumes:
+      - /opt/secrets:/opt/certs
+      - /opt/nifi_logs/nifi-2:/opt/nifi/nifi-current/logs
+      - /opt/nifi_data/nifi-2:/opt/nifi/nifi-current/data
+      - /opt/nifi_lib/postgresql-42.7.6.jar:/opt/nifi/nifi-current/lib/postgresql-42.7.6.jar
+      - /opt/ssl/kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
+
+  nifi-3:
+    image: apache/nifi:1.21.0
+    container_name: nifi
+    ports:
+      - 8083:8443
+    networks:
+      - kafka-network
+    environment:
+      AUTH: "tls"
+      KEYSTORE_TYPE: PKCS12
+      KEYSTORE_PASSWORD: changeit
+      TRUSTSTORE_TYPE: JKS
+      TRUSTSTORE_PASSWORD: changeit
+      KEYSTORE_PATH: /opt/certs/nifi-3.p12
+      TRUSTSTORE_PATH: /opt/certs/nifi-cluster-truststore.jks
+      NIFI_WEB_HTTP_PORT: 8080
+      NIFI_CLUSTER_IS_NODE: true
+      NIFI_CLUSTER_NODE_PROTOCOL_PORT: 8082
+      NIFI_ZK_CONNECT_STRING: zookeeper:2281
+      NIFI_ELECTION_MAX_WAIT: 1 min
+      NIFI_SENSITIVE_PROPS_KEY: 3e38a10eb5fb
+      NIFI_WEB_HTTPS_PORT: 8443
+    volumes:
+      - /opt/secrets:/opt/certs
+      - /opt/nifi_logs/nifi-3:/opt/nifi/nifi-current/logs
+      - /opt/nifi_data/nifi-3:/opt/nifi/nifi-current/data
       - /opt/nifi_lib/postgresql-42.7.6.jar:/opt/nifi/nifi-current/lib/postgresql-42.7.6.jar
       - /opt/ssl/kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
 
