@@ -75,7 +75,7 @@ services:
     container_name: nifi-1
     hostname: nifi-1
     volumes:
-      # - ./postgresql-42.7.6.jar:/opt/nifi/nifi-current/lib/postgresql-42.7.6.jar
+      - ./postgresql-42.7.6.jar:/opt/nifi/nifi-current/lib/postgresql-42.7.6.jar
       - ./kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
       - nifi_certs:/opt/certs
       - nifi-1_conf:/opt/nifi/nifi-current/conf
@@ -102,6 +102,7 @@ services:
     container_name: nifi-2
     hostname: nifi-2
     volumes:
+      - ./postgresql-42.7.6.jar:/opt/nifi/nifi-current/lib/postgresql-42.7.6.jar
       - ./kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
       - nifi_certs:/opt/certs
       - nifi-2_conf:/opt/nifi/nifi-current/conf
@@ -128,6 +129,7 @@ services:
     container_name: nifi-3
     hostname: nifi-3
     volumes:
+      - ./postgresql-42.7.6.jar:/opt/nifi/nifi-current/lib/postgresql-42.7.6.jar
       - ./kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
       - nifi_certs:/opt/certs
       - nifi-3_conf:/opt/nifi/nifi-current/conf
