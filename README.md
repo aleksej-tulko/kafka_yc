@@ -53,11 +53,6 @@ NIFI_PASSWORD='nifi-pw'
 
 
 CREATE TABLE test (
-    name VARCHAR(100),
-    info VARCHAR(100)
-);
-
-CREATE TABLE test (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100),
     info VARCHAR(100),
