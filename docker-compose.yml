@@ -1,6 +1,3 @@
-x-user: &user nifi-user
-x-pwd: &pwd nifi-password
-
 x-app-base: &app-base
   build:
       context: .
