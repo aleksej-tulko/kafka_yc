@@ -51,6 +51,7 @@ POSTGRES_DB='postgres-db'
 NIFI_USER='nifi-user'
 NIFI_PASSWORD='nifi-pw'
 
+sudo docker exec -it postgres psql -h 127.0.0.1 -U postgres-user -d postgres-db
 
 CREATE TABLE test (
     id SERIAL PRIMARY KEY,
@@ -68,107 +69,6 @@ keytool -importcert \
   -storepass changeit \
   -noprompt
 
-
-
-
-vault write kafka-int-ca/roles/kafka-broker \
-  allowed_domains="localhost,nifi-1,nifi-2,nifi-3" \
-  allow_subdomains=true allow_bare_domains=true \
-  allow_ip_sans=true allow_localhost=true \
-  enforce_hostnames=false \
-  server_flag=true client_flag=false \
-  key_type="rsa" key_bits=2048 ttl="720h" max_ttl="720h" \
-  key_usage="DigitalSignature,KeyEncipherment" \
-  ext_key_usage="ServerAuth,ClientAuth"
-
-vault write kafka-int-ca/roles/zookeeper \
-  allowed_domains="localhost,zookeeper" \
-  allow_subdomains=true allow_bare_domains=true \
-  allow_ip_sans=true allow_localhost=true \
-  enforce_hostnames=false \
-  server_flag=true client_flag=false \
-  key_type="rsa" key_bits=2048 ttl="720h" max_ttl="720h" \
-  key_usage="DigitalSignature,KeyEncipherment" \
-  ext_key_usage="ServerAuth"
-
-
-vault write -format=json kafka-int-ca/issue/zookeeper \
-  common_name="zookeeper" \
-  alt_names="zookeeper,localhost" \
-  ip_sans="127.0.0.1" \
-  > /vault/certs/zookeeper.json
-
-jq -r ".data.private_key"  /vault/certs/zookeeper.json > /vault/certs/zookeeper.key
-jq -r ".data.certificate"  /vault/certs/zookeeper.json > /vault/certs/zookeeper.crt
-jq -r ".data.ca_chain[]"   /vault/certs/zookeeper.json > /vault/certs/ca-chain.crt
-chmod 600 /vault/certs/zookeeper.key
-
-openssl pkcs12 -export \
-  -inkey    /vault/certs/zookeeper.key \
-  -in       /vault/certs/zookeeper.crt \
-  -certfile /vault/certs/ca-chain.crt \
-  -name zookeeper \
-  -out /vault/certs/zookeeper.p12 \
-  -passout pass:changeit
-
-
-vault write -format=json kafka-int-ca/issue/kafka-broker \
-  common_name="nifi-1" \
-  alt_names="localhost" \
-  ip_sans="127.0.0.1" \
-  > /vault/certs/nifi-1.json
-
-jq -r ".data.private_key"  /vault/certs/nifi-1.json > /vault/certs/nifi-1.key
-jq -r ".data.certificate"  /vault/certs/nifi-1.json > /vault/certs/nifi-1.crt
-chmod 600 /vault/certs/nifi-1.key
-
-openssl pkcs12 -export \
-  -inkey    /vault/certs/nifi-1.key \
-  -in       /vault/certs/nifi-1.crt \
-  -certfile /vault/certs/ca-chain.crt \
-  -name nifi-1 \
-  -out /vault/certs/nifi-1.p12 \
-  -passout pass:changeit
-
-
-vault write -format=json kafka-int-ca/issue/kafka-broker \
-  common_name="nifi-2" \
-  alt_names="localhost" \
-  ip_sans="127.0.0.1" \
-  > /vault/certs/nifi-2.json
-
-jq -r ".data.private_key"  /vault/certs/nifi-2.json > /vault/certs/nifi-2.key
-jq -r ".data.certificate"  /vault/certs/nifi-2.json > /vault/certs/nifi-2.crt
-chmod 600 /vault/certs/nifi-2.key
-
-openssl pkcs12 -export \
-  -inkey    /vault/certs/nifi-2.key \
-  -in       /vault/certs/nifi-2.crt \
-  -certfile /vault/certs/ca-chain.crt \
-  -name nifi-2 \
-  -out /vault/certs/nifi-2.p12 \
-  -passout pass:changeit
-
-
-vault write -format=json kafka-int-ca/issue/kafka-broker \
-  common_name="nifi-3" \
-  alt_names="localhost" \
-  ip_sans="127.0.0.1" \
-  > /vault/certs/nifi-3.json
-
-jq -r ".data.private_key"  /vault/certs/nifi-3.json > /vault/certs/nifi-3.key
-jq -r ".data.certificate"  /vault/certs/nifi-3.json > /vault/certs/nifi-3.crt
-chmod 600 /vault/certs/nifi-3.key
-
-openssl pkcs12 -export \
-  -inkey    /vault/certs/nifi-3.key \
-  -in       /vault/certs/nifi-3.crt \
-  -certfile /vault/certs/ca-chain.crt \
-  -name nifi-3 \
-  -out /vault/certs/nifi-3.p12 \
-  -passout pass:changeit
-
-cd /opt/secrets
 
 sudo keytool -import -alias root-ca -trustcacerts \
   -file root-ca.pem \
