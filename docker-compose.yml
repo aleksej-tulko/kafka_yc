@@ -1,5 +1,5 @@
-x-user: &user admin
-x-pwd: &pwd supersecret1
+x-user: &user nifi-user
+x-pwd: &pwd nifi-password
 
 x-app-base: &app-base
   build:
