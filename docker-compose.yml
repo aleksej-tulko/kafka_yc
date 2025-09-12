@@ -1,7 +1,24 @@
-x-nifi-base: &nifi-base
-  image: apache/nifi:1.21.0
+x-app-base: &app-base
+  build:
+      context: .
+      dockerfile: docker/Dockerfile
   networks:
     - nifi-network
+  env_file:
+      - .env
+  restart: always
+  deploy:
+    mode: replicated
+    replicas: 3
+
+x-nifi-base: &nifi-base
+  image: apache/nifi:1.21.0
+  depends_on:
+      nifi-toolkit:
+        condition: service_completed_successfully
+  networks:
+    - nifi-network
+  restart: always
 
 x-nifi-toolkit-base: &nifi-toolkit-base
   image: apache/nifi-toolkit:1.21.0
@@ -57,9 +74,6 @@ services:
     <<: *nifi-base
     container_name: nifi-1
     hostname: nifi-1
-    depends_on:
-      nifi-toolkit:
-        condition: service_completed_successfully
     volumes:
       - ./kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
       - nifi_certs:/opt/certs
@@ -86,9 +100,6 @@ services:
     <<: *nifi-base
     container_name: nifi-2
     hostname: nifi-2
-    depends_on:
-      nifi-toolkit:
-        condition: service_completed_successfully
     volumes:
       - ./kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
       - nifi_certs:/opt/certs
@@ -115,9 +126,6 @@ services:
     <<: *nifi-base
     container_name: nifi-3
     hostname: nifi-3
-    depends_on:
-      nifi-toolkit:
-        condition: service_completed_successfully
     volumes:
       - ./kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
       - nifi_certs:/opt/certs
@@ -141,32 +149,12 @@ services:
       - "sed -i 's/nifi.ui.banner.text=.*/nifi.ui.banner.text=nifi-3 (v1.21.0)/' conf/nifi.properties; ../scripts/start.sh"
 
   app_producer:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    networks:
-      - nifi-network
-    env_file:
-      - .env
+    <<: *app-base
     command: python3 producer.py
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 3
 
   app_consumer:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    networks:
-      - nifi-network
-    env_file:
-      - .env
+    <<: *nifi-base
     command: python3 consumer.py
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 3
 
   postgres:
     image: debezium/postgres:16
