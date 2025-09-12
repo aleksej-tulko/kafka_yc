@@ -75,7 +75,7 @@ services:
     container_name: nifi-1
     hostname: nifi-1
     volumes:
-      - ./postgresql-42.7.6.jar:/opt/nifi/nifi-current/lib/postgresql-42.7.6.jar
+      # - ./postgresql-42.7.6.jar:/opt/nifi/nifi-current/lib/postgresql-42.7.6.jar
       - ./kafka-truststore.jks:/opt/nifi/nifi-current/kafka-truststore.jks
       - nifi_certs:/opt/certs
       - nifi-1_conf:/opt/nifi/nifi-current/conf
