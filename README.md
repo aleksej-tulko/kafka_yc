@@ -27,7 +27,7 @@ cd kafka_yc
 2. Создать файл с переменными окружения для сервисов в *docker-compose.yml*:
 ```bash
 cat > .env <<'EOF'
-BOOTSTRAP_SERVERS='<known_after_terraform>:9091,<known_after_terraform>:9091,<known_after_terraform>:9091'
+BOOTSTRAP_SERVERS='<known_after_terraform>:9091,<known_after_terraform>:9091,<known_after_terraform>:9091' ### Внимание! Сюда надо будет подставить FQDN брокеров Kafka, когда они будут известны после запуска terraform apply
 TOPIC='test_topic'
 DLQ='dead_letter_queue'
 
@@ -57,7 +57,7 @@ NIFI_USER='nifi-user'
 NIFI_PASSWORD='nifi-password'
 NIFI_SENSITIVE_PROPS_KEY='3e38a10eb5fb'
 
-HOST_ADDR='localhost'
+HOST_ADDR='<your_ip>' #### Внимание! Сюда надо будет подставить IP той ноды, где будет запущен кластер Nifi
 EOF
 ```
 
@@ -73,8 +73,8 @@ kafka_resource_preset_id = "b3-c1-m4"
 kafka_disk_size = 10
 zookeeper_resource_preset_id = "b3-c1-m4"
 zookeeper_disk_size = 10
-network_id = "<your_vpc_network>"
-subnet_ids = [<list_of_your_subnets>]
+network_id = "<your_vpc_network>" ### Внимание! Сюда надо будет подставить ID твоей vpc
+subnet_ids = [<list_of_your_subnets>] ### Внимание! Сюда надо подставить сабнеты твоей vpc в виде строке
 kafka_topics = [{
   name               = "test_topic"
   partitions         = 3
@@ -169,7 +169,6 @@ cd ~/kafka_yc
 wget "https://storage.yandexcloud.net/cloud-certs/CA.pem" --output-document ./YandexInternalRootCA.crt
 chmod 0655 ./YandexInternalRootCA.crt
 keytool -importcert -alias kafka-broker -file YandexInternalRootCA.crt -keystore kafka-truststore.jks -storepass changeit -noprompt
-sudo chown 1000:1000 kafka-truststore.jks
 ```
 
 5. Скачать JDBC драйвер для Postgres:
@@ -178,8 +177,89 @@ wget https://jdbc.postgresql.org/download/postgresql-42.7.6.jar
 sudo chown 1000:1000 postgresql-42.7.6.jar
 ```
 
-Так должен выглядеть каталог для за
+Так должен выглядеть каталог перед запуском на ноде, где ,будут запускаться сервисы из *docker-compose.yml*:
+
 ![alt text](image.png)
+
+6. Спуллить и сбилдать все образы:
+```bash
+sudo docker compose pull
+sudo docker compose build
+```
+
+6. Запустить сервис с Postgres и создать таблицу:
+```bash
+sudo docker compose up postgres -d
+sudo docker compose exec -it postgres psql -h 127.0.0.1 -U postgres-user -d postgres-db
+
+CREATE TABLE test (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    info VARCHAR(100),
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+7. Запустить *Apache Nifi* кластер:
+```bash
+sudo docker compose up zookeeper nifi-toolkit nifi-1 nifi-2 nifi-3 proxy -d
+```
+
+8. Дождаться, пока кластер будет готов, и аутентфицироваться в браузере по адресу *https://your_ip:8443* с NIFI_USER
+NIFI_PASSWORD из файла **.env**
+
+9. Настроить процессор, который будет получить сообщения в формате Avro и складыть в Postgres:
+
+    - Добавить *PutDatabaseRecord* процессор
+    - Настроить его как на скринах:
+
+    ![alt text](image-1.png)
+    ![alt text](image-2.png)
+
+    - Настроить контроллер *AvroReaderPostgres* как на скрине:
+
+    ![alt text](image-3.png)
+
+    - Настроить контроллер *DBCPConnectionPool* как показано на скрине (*Database User* и *Password* взять из **.env**)
+
+    ![alt text](image-4.png)
+
+10. Инициализировать terraform:
+```bash
+cd ~/kafka_yc/terraform_kafka_managed
+export YC_TOKEN=$(yc iam create-token)
+export YC_CLOUD_ID=$(yc config get cloud-id)
+export YC_FOLDER_ID=$(yc config get folder-id)
+terraform init
+```
+
+# Запуск Managed Apache Kafka и отправка сообщений
+
+1. Запуск terraform:
+```bash
+cd ~/kafka_yc/terraform_kafka_managed
+terraform apply
+```
+
+2. Забрать FQDN, которые после выполнения terraform отдал вывод и записать их в BOOTSTRAP_SERVER в **.env**:
+
+![alt text](image-5.png)
+![alt text](image-6.png)
+
+3. Запуск продюсера:
+```bash
+cd ~/kafka_yc
+sudo docker compose up app_producer -d
+```
+
+4. Конфигурация процессера в Apache Nifi, который будет читать созданный с помощью terraform топик и передавать сообщения в процессор, который будет складывать их в Postgres:
+
+    - Вернуться к *https://your_ip:8443* в браузере и создать новый процессор ConsumeKafkaRecord_2_0
+    - Сконфигурировать контроллеры как на скринах:
+
+    
+
+
 
 
 echo "test message" | kcat -P \
