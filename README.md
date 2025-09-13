@@ -11,7 +11,7 @@ kafka_yc - это кластер из 3-х Apache Nifi сервисов, коо�
 - **OS**: Linux Ubuntu 24.04 aarm
 - **Python**: Python 3.12.3
 - **Docker**: 28.2.2 - https://docs.docker.com/engine/install/ubuntu/
-- **Hashicorp Terraform**: https://yandex.cloud/ru/docs/tutorials/infrastructure-management/terraform-quickstart
+- **Terraform**: https://yandex.cloud/ru/docs/tutorials/infrastructure-management/terraform-quickstart ### Terraforn от Hashicorp тоже сойдет, я таким и пользуюсь
 - **Yandex Cloud CLI**: https://yandex.cloud/ru/docs/cli/quickstart#install
 
 
@@ -27,7 +27,7 @@ cd kafka_yc
 2. Создать файл с переменными окружения для сервисов в *docker-compose.yml*:
 ```bash
 cat > .env <<'EOF'
-BOOTSTRAP_SERVERS='<known_after_terraform>:9091,<known_after_terraform>:9091,<known_after_terraform>:9091' ### Внимание! Сюда надо будет подставить FQDN брокеров Kafka, когда они будут известны после запуска terraform apply
+BOOTSTRAP_SERVERS='<fqdn>:9091,<fqdn>:9091,<fqdn>:9091' ### Внимание! Сюда надо будет подставить FQDN брокеров Kafka, когда они будут известны после запуска terraform apply
 TOPIC='test_topic'
 DLQ='dead_letter_queue'
 
@@ -205,20 +205,20 @@ CREATE TABLE test (
 sudo docker compose up zookeeper nifi-toolkit nifi-1 nifi-2 nifi-3 proxy -d
 ```
 
-8. Дождаться, пока кластер будет готов, и аутентфицироваться в браузере по адресу *https://your_ip:8443* с NIFI_USER
+8. Дождаться, пока кластер будет готов (довольно долго выполняет *Expanding 128 NAR files with all processors...*, хотя возможно мой raspberry просто слабоват и на нормальной ноде будет быстро), и аутентфицироваться в браузере по адресу *https://your_ip:8443* с NIFI_USER
 NIFI_PASSWORD из файла **.env**
 
-9. Настроить процессор, который будет получить сообщения в формате Avro и складыть в Postgres:
+9. Настроить процессор, который будет получить сообщения в формате Avro и складывать в Postgres:
 
     - Добавить *PutDatabaseRecord* процессор
     - Настроить его как на скринах:
 
-    ![alt text](image-1.png)
+    ![alt text](image-10.png)
     ![alt text](image-2.png)
 
-    - Настроить контроллер *AvroReaderPostgres* как на скрине:
+    - Настроить контроллер *AvroReaderDatabase* как на скрине:
 
-    ![alt text](image-3.png)
+    ![alt text](image-11.png)
 
     - Настроить контроллер *DBCPConnectionPool* как показано на скрине (*Database User* и *Password* взять из **.env**)
 
@@ -255,89 +255,57 @@ sudo docker compose up app_producer -d
 4. Конфигурация процессера в Apache Nifi, который будет читать созданный с помощью terraform топик и передавать сообщения в процессор, который будет складывать их в Postgres:
 
     - Вернуться к *https://your_ip:8443* в браузере и создать новый процессор ConsumeKafkaRecord_2_0
+
+    ![alt text](image-13.png) В Kafka Brokers подставить значение переменной BOOTSTRAP_SERVER из пункта 2. В Topic Name(s) подставить значение переменной TOPIC из **.env**
+    ![alt text](image-14.png) В поля Username и Password вставить значения переменных CONSUMER_USERNAME и CONSUMER_PASSWORD из **.env**
     - Сконфигурировать контроллеры как на скринах:
 
-    
+    *AvroReaderTest*
+    ![alt text](image-16.png)
 
+    *AvroRecordSetWriter*
+    ![alt text](image-17.png)
 
+    *ConfluentSchemaRegistry*
+    В поле **Schema Registry URLs** подставить те же FQDN,
+    что и в переменной BOOTSTRAP_SERVER из пункта 2, но без порта 9091 и с протоколом *https*. Например, https://rc1a-24gplv6n7qfkoqo9.mdb.yandexcloud.net
+    ![alt text](image-18.png)
 
+    *StabdardRestrictedSSLContextService*
+    В поле Truststore Password подставить пароль *changeit*, с которым создавали трастстор ранее.
+    ![alt text](image-19.png)
 
-echo "test message" | kcat -P \
-    -b rc1a-ucd9gdk8nnlkhgm6.mdb.yandexcloud.net:9091 \
-    -t test_topic \
-    -k key \
-    -X security.protocol=SASL_SSL \
-    -X sasl.mechanism=SCRAM-SHA-512 \
-    -X sasl.username="test_producer" \
-    -X sasl.password="producer_pass" \
-    -X ssl.ca.location=/usr/local/share/ca-certificates/Yandex/YandexInternalRootCA.crt -Z
+  По итогу должен быть такой набор контроллеров
+  ![alt text](image-20.png) и такой набор процессоров ![alt text](image-21.png)
 
+5. Зайти в Postgres и проверить, что там появились записи:
+```bash
+sudo docker compose exec -it postgres psql -h 127.0.0.1 -U postgres-user -d postgres-db
 
-kcat -C \
-         -b rc1a-hq1uite1apjk5rfr.mdb.yandexcloud.net:9091 \
-         -t test_topic \
-         -X security.protocol=SASL_SSL \
-         -X sasl.mechanism=SCRAM-SHA-512 \
-         -X sasl.username="test_consumer" \
-         -X sasl.password="consumer_pass" \
-         -X ssl.ca.location=/usr/local/share/ca-certificates/Yandex/YandexInternalRootCA.crt -Z -K:
+SELECT * FROM test;
+```
 
+6. Запустить *app_consumer* (там должны выводиться те же записи, что и в Postgres):
+```bash
+sudo docker compose up app_consumer
+```
 
-BOOTSTRAP_SERVERS='rc1a-8absvvlg11e9di8v.mdb.yandexcloud.net:9091,rc1a-d02dt23g03vidig5.mdb.yandexcloud.net:9091,rc1a-gf0rumtpj5mk5a82.mdb.yandexcloud.net:9091'
-TOPIC='test_topic'
-DLQ='dead_letter_queue'
+# Скриншоты и схемы
 
-ACKS_LEVEL='all'
-RETRIES=3
-COMPRESSION_TYPE='lz4'
-AUTOOFF_RESET='earliest'
-ENABLE_AUTOCOMMIT=False
-SESSION_TIME_MS=60000
-FETCH_MIN_BYTES=1
-FETCH_WAIT_MAX_MS=100
+Скриншот ответа вызова curl http://localhost:8081/subjects и curl -X GET http://localhost:8081/subjects/<название_схемы>/versions:
+![alt text](image-22.png)
+![alt text](image-23.png)
 
-PRODUCER_USERNAME='test_producer'
-CONSUMER_USERNAME='test_consumer'
-SCHEMA_REGISTRY_WRITER_USERNAME='test_schema_writer'
-SCHEMA_REGISTRY_READER_USERNAME='test_schema_reader'
+Файл схемы (.avsc или .json).
+```json
+{"id":1,"schema":"{\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"info\",\"type\":\"string\"}],\"name\":\"value\",\"namespace\":\"avro_test\",\"type\":\"record\"}","subject":"test_topic-value","version":1}
+```
 
-PRODUCER_PASSWORD='producer_pass'
+Подтверждение успешной передачи сообщений![alt text](image-24.png)
 
-CONSUMER_PASSWORD='consumer_pass'
-SCHEMA_REGISTRY_PASSWORD='schema_pass'
+Подтверждение успешного получения сообщений в *app_consumer*
 
-POSTGRES_USER='postgres-user'
-POSTGRES_PASSWORD='postgres-pw'
-POSTGRES_DB='postgres-db'
+Подтверждение успешного получения сообщений в БД![alt text](image-25.png)
 
-NIFI_USER='nifi-user'
-NIFI_PASSWORD='nifi-pw'
-
-sudo docker exec -it postgres psql -h 127.0.0.1 -U postgres-user -d postgres-db
-
-CREATE TABLE test (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100),
-    info VARCHAR(100),
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
-
-keytool -importcert \
-  -alias kafka-broker \
-  -file YandexInternalRootCA.crt \
-  -keystore kafka-truststore.jks \
-  -storepass changeit \
-  -noprompt
-
-
-sudo keytool -import -alias root-ca -trustcacerts \
-  -file root-ca.pem \
-  -keystore nifi-cluster-truststore.jks \
-  -storepass changeit -noprompt
-
-sudo keytool -import -alias kafka-int-ca -trustcacerts \
-  -file kafka-int-ca.pem \
-  -keystore nifi-cluster-truststore.jks \
-  -storepass changeit -noprompt
+## Автор
+[Aliaksei Tulko](https://github.com/aleksej-tulko)
