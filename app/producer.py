@@ -114,6 +114,7 @@ dlq_producer = Producer(dlq_producer_conf)
 
 
 def send_to_dlq(dlq_producer, key, value, error) -> None:
+    """Отправка сообщений в Dead Letter Queue."""
     payload = {
         'key': key,
         'value': value,
