@@ -177,7 +177,7 @@ wget https://jdbc.postgresql.org/download/postgresql-42.7.6.jar
 sudo chown 1000:1000 postgresql-42.7.6.jar
 ```
 
-Так должен выглядеть каталог перед запуском на ноде, где ,будут запускаться сервисы из *docker-compose.yml*:
+Так должен выглядеть каталог перед запуском на ноде, где будут запускаться сервисы из *docker-compose.yml*:
 
 ![alt text](image.png)
 
@@ -303,7 +303,7 @@ sudo docker compose up app_consumer
 
 Подтверждение успешной передачи сообщений![alt text](image-24.png)
 
-Подтверждение успешного получения сообщений в *app_consumer*
+Подтверждение успешного получения сообщений в *app_consumer*![alt text](image-26.png)
 
 Подтверждение успешного получения сообщений в БД![alt text](image-25.png)
 
